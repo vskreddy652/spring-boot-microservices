@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Implementation-Title: externalize-config-properties-yaml
+Implementation-Version: 1.0
+Built-By: V SURESH KUMAR REDDY
+Implementation-Vendor-Id: org.springframework.boot
+Build-Jdk: 1.8.0_201
+Implementation-URL: https://www.mkyong.com
+Created-By: Maven Integration for Eclipse
+
