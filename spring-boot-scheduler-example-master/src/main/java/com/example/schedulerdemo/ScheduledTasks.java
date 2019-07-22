@@ -26,7 +26,7 @@ public class ScheduledTasks {
     public void scheduleTaskWithFixedDelay() {
         logger.info("Fixed Delay Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException ex) {
             logger.error("Ran into an error {}", ex);
             throw new IllegalStateException(ex);
