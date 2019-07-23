@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: Spring Security - method-level-security
+Implementation-Version: 1.0.0-SNAPSHOT
+Built-By: V SURESH KUMAR REDDY
+Implementation-Vendor-Id: com.mnf.spring.security
+Build-Jdk: 1.8.0_201
+Implementation-URL: http://memorynotfound.com
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

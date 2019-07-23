@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: com.vskreddy652.rest
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: V SURESH KUMAR REDDY
+Implementation-Vendor-Id: com.vskreddy
+Build-Jdk: 1.8.0_201
+Implementation-URL: http://projects.spring.io/spring-boot/com.vskreddy
+ 652.rest/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+
