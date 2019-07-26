@@ -1,0 +1,29 @@
+Step 1: Before start to build Angular application mentor-on-demand-ui. to do this uncomment below line in from index.html to enabel external library js files
+        <!--
+            <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+            <script type="text/javascript" src="assets/js/jquery-1.12.4.js"></script>
+            <script type="text/javascript" src="assets/js/jquery-ui.js"></script>
+            <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+            <script type="text/javascript" src="assets/js/jquery_004.js"></script>
+        -->
+
+Step 2: build angular application
+        ng build
+
+Step 3: Keep dockerfile, _htaccess & httpd.conf files in dist direcory which was created in Step 2.
+
+Step 4: Copy dist folder into C:\Program Files\Docker Toolbox
+
+Step 5: Create an Image using below command
+        cd dist
+        docker build -t ng_httpd3 .
+
+Step 6: Once image being created, create container & start it, using below command
+        docker run -dit --name mentor-on-demand-ui -p 8084:80 ng_httpd3
+
+Step 7: Open chrome browser and paste below link to check
+        http://192.168.99.100:8084/
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4be681fac58617dfca34f4000fa3dfbc479b5167

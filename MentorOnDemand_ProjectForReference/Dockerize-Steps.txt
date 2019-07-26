@@ -1,0 +1,139 @@
+Pull MySQL image from dockerhub and configure to run in docker container for Windows
+-------------------------------------------------------------------------------------
+Step 1: Pull mysql server from docker hub
+		docker pull mysql/mysql-server
+Step 2: Start a new Docker container for the MySQL Server
+		docker run --name=mysql1 --network=basic-bridge -p 3306:3306 -d mysql/mysql-server
+Step 3: The container initialization might take some time. When the server is ready for use, the STATUS of the container in the output of the docker ps command changes from (health: starting) to (healthy).
+		docker container ls -a
+		CONTAINER ID        IMAGE                COMMAND                  CREATED             STATUS                      PORTS                                             NAMES
+		122a045f04fe        mysql/mysql-server   "/entrypoint.sh mysq"   2 minutes ago       Up 3 minutes (healthy)      0.0.0.0:3306->3306/tcp, 33060/tcp                 mysql1
+		8ce340a957c6        0da05d84b1fe         "docker-entrypoint.s"   6 days ago          Exited (255) 25 hours ago   27017/tcp                                         goofy_wescoff 
+Step 4: Once initialization is finished, the command's output is going to contain the random password generated for the root user; check the password with
+		docker logs mysql1 2>&1 | grep GENERATED
+		[Entrypoint] GENERATED ROOT PASSWORD: uLawzULN3pxAvv@pOd,Ox.aDYvA
+Step 5: Once the server is ready, you can run the mysql client within the MySQL Server container you just started, and connect it to the MySQL Server. Use the docker exec -it command to start a mysql client inside the Docker container you have started, like the following: 
+		docker exec -it mysql1 mysql -uroot -p
+		When asked, enter the generated root password i.e. uLawzULN3pxAvv@pOd,Ox.aDYvA
+Step 6: After you have connected a mysql client to the server, you must reset the server root password by issuing this statement: 
+		mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'pass@word1';
+Step 7: To set root access from any machine
+		mysql> use mysql;
+		mysql> update user set host='%' where user='root';
+		mysql> flush privileges;
+        mysql> exit;
+
+Pull MongoDB image from dockerhub and configure to run in docker container for Windows
+---------------------------------------------------------------------------------------
+Step 1: Pull mongo db from docker hub
+		docker pull mongo
+Step 2: Create a volume to persist the Mongo database:
+		docker volume create --name=mongodata
+Step 3: Run the mongo docker instance without auth enabled
+		docker run --name=mongo -p 27017:27017 -v mongodata:/data/db -d mongo
+Step 4: Open bash on the running docker instance
+		docker ps
+		CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES
+		573beb2cf48f        mongo               "docker-entrypoint.s"   8 minutes ago       Up 8 minutes        0.0.0.0:27017->27017/tcp            mongo
+		e8c17a533dd9        mysql               "docker-entrypoint.s"   17 hours ago        Up 17 hours         0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+		docker exec -it 573beb2cf48f bash
+        root@573beb2cf48f:/#
+Step 5: Enter the mongo shell by typing mongo.
+		root@573beb2cf48f:/# mongo
+Step 6: Create user named root and give that user dbOwner role to read & wirte the payment_service, training_service and user_service databases.
+		> db.dropUser("root")
+		
+        > use payment_service
+		> db.createUser({ user: "root", pwd: "pass@word1", roles: [{ role: "dbOwner", db: "payment_service" }] })
+
+		> use training_service
+		> db.createUser({ user: "root", pwd: "pass@word1", roles: [{ role: "dbOwner", db: "training_service" }] })
+
+		> use user_service
+		> db.createUser({ user: "root", pwd: "pass@word1", roles: [{ role: "dbOwner", db: "user_service" }] })
+Step 7: Exit from mongod shell and bash.
+		> exit
+		bye
+		root@573beb2cf48f:/# exit
+		exit
+Step 8: Stop the docker instance using the below command.
+		docker stop mongo
+		docker rm mongo
+Step 9: Now run the mongo docker with auth enabled
+		docker run --name=mongo --network=basic-bridge -p 27017:27017 -v mongodata:/data/db -d mongo mongod --auth
+
+
+After start mysql and mongo databases build and run each micro services
+-----------------------------------------------------------------------------
+
+1) Build & Run eureka-server micro service
+   Step 1: Build image for eureka-server micro service
+           docker build -f docker_eureka_server -t eureka-server .
+   Step 2: Run eureka-server image in port 8761
+           docker run --name=eureka-server --network=basic-bridge -p 8761:8761 -d eureka-server
+   Step 3: Check logs for container named for eureka-server
+           docker logs eureka-server
+
+2) Build & Run zuul-gateway micro service
+   Step 1: Build image for zuul-gateway micro service
+           docker build -f docker_zuul_gateway -t zuul-gateway .
+   Step 2: Run zuul-gateway image in port 8079
+           docker run --name=zuul-gateway --network=basic-bridge -p 8079:8079 -d zuul-gateway
+   Step 3: Check logs for container named for zuul-gateway
+           docker logs zull-gateway
+
+3) Build & Run payment-service micro service
+   Step 1: Build image for payment-service micro service
+           docker build -f docker_payment_service -t payment-service .
+   Step 2: Run payment-service image in port 8090     
+           docker run --name=payment-service --network=basic-bridge -p 8090:8090 -d payment-service
+   Step 3: Check logs for container named for payment-service
+           docker logs payment-service
+
+4) Build & Run technology-service micro service
+   Step 1: Build image for technology-service micro service
+           docker build -f docker_technology_service -t technology-service .
+   Step 2: Run technology-service image in port 8080
+           docker run --name=technology-service --network=basic-bridge -p 8080:8080 -d technology-service
+   Step 3: Check logs for container named for technology-service
+           docker logs technology-service
+
+5) Build & Run training-service micro service
+   Step 1: Build image for training-service micro service
+           docker build -f docker_training_service -t training-service .
+   Step 2: Run training-service image in port 8085
+           docker run --name=training-service --network=basic-bridge -p 8085:8085 -d training-service
+   Step 3: Check logs for container named for training-service
+           docker logs training-service
+
+6) Build & Run search-service micro service
+   Step 1: Build image for search-service micro service
+           docker build -f docker_search_service -t search-service .
+   Step 2: Run search-service image in port 8065
+           docker run --name=search-service --network=basic-bridge -p 8065:8065 -d search-service
+   Step 3: Check logs for container named for search-service
+           docker logs search-service
+
+7) Build & Run user-service micro service
+   Step 1: Build image for user-service micro service
+           docker build -f docker_user_service -t user-service .
+   Step 2: Run user-service image in port 8060
+           docker run --name=user-service --network=basic-bridge -p 8060:8060 -d user-service
+   Step 3: Check logs for container named for user-service
+           docker logs user-service
+
+
+To check all containers in docker
+-------------------------------------
+$ docker container ls -a
+CONTAINER ID        IMAGE                COMMAND                  CREATED             STATUS                       PORTS                               NAMES
+c51aff1a7f27        zuul-gateway         "java -jar zuul-gate"   About an hour ago   Up About an hour             0.0.0.0:8079->8079/tcp              zuul-gateway
+42dc80031602        user-service         "java -jar user-serv"   13 hours ago        Up 37 minutes                0.0.0.0:8060->8060/tcp              user-service
+346becd448ba        search-service       "java -jar search-se"   13 hours ago        Up 7 minutes                 0.0.0.0:8065->8065/tcp              search-service
+8b69743b32fe        training-service     "java -jar training-"   13 hours ago        Exited (1) 11 minutes ago                                        training-service
+c3b9c88e3b92        technology-service   "java -jar technolog"   13 hours ago        Up 7 minutes                 0.0.0.0:8080->8080/tcp              technology-service
+58901fec21a3        payment-service      "java -jar payment-s"   13 hours ago        Exited (137) 6 minutes ago                                       payment-service
+959d578e1014        eureka-server        "java -jar eureka-se"   2 days ago          Up 2 days                    0.0.0.0:8761->8761/tcp              eureka-server
+653e1eb8429a        mongo                "docker-entrypoint.s"   2 days ago          Up 2 days                    0.0.0.0:27017->27017/tcp            mongo
+e2bcea1a8b73        mysql/mysql-server   "/entrypoint.sh mysq"   2 days ago          Up 7 minutes (healthy)       0.0.0.0:3306->3306/tcp, 33060/tcp   mysql1
+8ce340a957c6        0da05d84b1fe         "docker-entrypoint.s"   8 days ago          Exited (255) 3 days ago      27017/tcp                           goofy_wescoff
