@@ -1,0 +1,12 @@
+# Configure this Discovery Server
+eureka:
+  instance:
+    hostname: localhost
+  client: 
+    registerWithEureka: false
+    fetchRegistry: false
+
+# HTTP (Tomcat) port
+server:
+#  port: 8761
+  port: 9090
